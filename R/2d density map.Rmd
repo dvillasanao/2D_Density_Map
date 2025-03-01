@@ -123,6 +123,7 @@ require(rgdal)          #Para importar shapefiles.
 require(sp)             # Classes and Methos for Spatial Data
 library(spdep)    # Índice de Moran 
 require(spdplyr)        #Data manipulation verbs for the sptial classes
+require(stringr)
 require(tidyverse) 
 require(unikn)          # Paleta de colores
 ```
@@ -211,3 +212,51 @@ Algunos delitos pueden ser del fuero común o federal dependiendo de las circuns
     - Delitos que involucran a funcionarios federales.    
     
 **Jurisdicción**: Son investigados y juzgados por las autoridades federales (Fiscalía General de la República).
+
+
+```{r, eval = FALSE}
+df <- read.csv(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.csv"), 
+               header = TRUE,
+               encoding = "latin1") %>% 
+       rename("CVE_ENT" = "Clave_Ent",
+              "CVE_MUN" = "Cve..Municipio") %>%
+       mutate(CVE_ENT = str_pad(.$CVE_ENT, width = 2, side = "left", pad = "0"),
+              CVE_MUN = str_pad(.$CVE_MUN, width = 5, side = "left", pad = "0"))
+
+```
+
+```{r, echo = FALSE}
+#save(df, file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.RData"))
+load(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.RData"))
+```
+
+```{r, echo = FALSE}
+require(gt)
+
+head(df, 10) %>% 
+ gt() %>%
+  tab_header(title = "Reportes de incidencia delictiva a nivel municipal",
+             subtitle = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública") %>%
+   tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+   tab_options(heading.title.font.size = 14, 
+               heading.subtitle.font.size = 12,
+               table.font.names = "Century Gothic",
+               table.font.size = 10,
+               table.align = 'center',
+               data_row.padding = px(1)) %>%
+    tab_style(style = list(cell_text(align = "left", 
+                                     weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+       cols_width(starts_with("Bien.jurídico.afectado") ~ px(180),
+                  starts_with("Modalidad") ~ px(180),
+                  everything() ~ px(100)) %>%
+          as_raw_html()
+```
+
+
+```{r}
+
+```
+
