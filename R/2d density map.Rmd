@@ -137,8 +137,6 @@ font_add_google("Montserrat", "montserrat")
 
 ## Objetivo 
 
-
-
 ## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
 
 El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`) es una institución clave en México, encargada de coordinar y ejecutar las políticas públicas en materia de seguridad pública. Su objetivo principal es fortalecer la seguridad en todo el país, trabajando en colaboración con los tres niveles de gobierno (federal, estatal y municipal).
@@ -162,3 +160,26 @@ Las funciones más importantes del `SESNSP`:
 * **Participación ciudadana:**
     * Fomenta la colaboración entre la ciudadanía y las autoridades en materia de seguridad.
 
+
+### Fuentes de información    
+
+El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP) recopila y publica información sobre incidencia delictiva a través de un proceso sistemático y riguroso que involucra a diversas fuentes oficiales y metodologías estadísticas estandarizadas. Esta institución gubernamental se encarga de centralizar, procesar y difundir los datos relacionados con la seguridad pública en todo el territorio mexicano, proporcionando así una visión integral de la situación delictiva en el país. Aquí te explico detalladamente cómo llevan a cabo este importante proceso de recolección y publicación de información:
+
+- **Fiscalías y Procuradurías:**
+    - Las fiscalías generales de los estados y la Fiscalía General de la República (FGR) proporcionan los datos detallados y sistemáticos sobre los delitos registrados en sus investigaciones, constituyendo una de las principales fuentes de información estadística a nivel nacional.
+    - Esta información abarca tanto las averiguaciones previas del sistema tradicional como las carpetas de investigación iniciadas bajo el nuevo sistema de justicia penal acusatorio, lo que permite una visión completa del panorama delictivo documentado oficialmente.
+- **Registros administrativos:**
+    - El SESNSP también utiliza y analiza datos provenientes de diversos registros administrativos de otras instituciones gubernamentales, como las corporaciones policiales estatales y municipales, así como los centros de atención de llamadas de emergencia (911), que complementan la información obtenida de las fiscalías para ofrecer un panorama más integral de la situación delictiva. 
+    
+    
+### Metodología:   
+
+- **Registro de delitos:**
+    - La incidencia delictiva se refiere específicamente a la presunta ocurrencia de delitos formalmente registrados en las investigaciones oficiales, siguiendo protocolos estandarizados que permiten la comparabilidad de los datos a nivel nacional e internacional.
+    - El SESNSP clasifica meticulosamente los delitos en diferentes categorías y subcategorías, tanto del fuero común como del fuero federal, utilizando criterios uniformes que facilitan el análisis estadístico y la identificación de patrones delictivos en diferentes regiones del país. 
+    
+    
+- **Publicación de datos:**
+    - El SESNSP publica periódicamente los datos compilados de incidencia delictiva en su sitio web oficial, a través de informes mensuales detallados y compendios anuales que permiten visualizar tendencias y comportamientos delictivos a lo largo del tiempo.
+    - También proporciona acceso a bases de datos abiertos en formatos compatibles con diferentes programas estadísticos para que la ciudadanía, investigadores, organizaciones civiles y otras instituciones gubernamentales puedan acceder, descargar y analizar la información de acuerdo con sus necesidades específicas.
+    - En su página oficial se pueden encontrar los datos desagregados por estado, municipio y región geográfica, y también se puede consultar información especializada sobre delitos federales y comunes, incluyendo variables como modalidad, tipo de delito, bienes jurídicos afectados y características demográficas generales.
