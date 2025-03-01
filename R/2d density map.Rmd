@@ -186,12 +186,12 @@ El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP) re
     
 ### Tipos de delitos 
 
-- La diferencia fundamental está en el bien jurídico protegido: en el fuero común, se protege a los ciudadanos individualmente, salvaguardando sus derechos personales y patrimoniales dentro del ámbito local; en el fuero federal, se protege a la nación como entidad soberana, incluyendo sus instituciones, la seguridad nacional y el orden constitucional.
-- Algunos delitos pueden ser del fuero común o federal dependiendo de las circunstancias específicas del caso, como la participación de funcionarios federales, el lugar donde se comete el delito (si ocurre en instalaciones federales), la naturaleza transnacional del mismo, o si afecta bienes o recursos que son propiedad o están bajo administración federal
+La diferencia fundamental está en el bien jurídico protegido: en el fuero común, se protege a los ciudadanos individualmente, salvaguardando sus derechos personales y patrimoniales dentro del ámbito local; en el fuero federal, se protege a la nación como entidad soberana, incluyendo sus instituciones, la seguridad nacional y el orden constitucional.   
 
-**Delitos del Fuero Común:**
+Algunos delitos pueden ser del fuero común o federal dependiendo de las circunstancias específicas del caso, como la participación de funcionarios federales, el lugar donde se comete el delito (si ocurre en instalaciones federales), la naturaleza transnacional del mismo, o si afecta bienes o recursos que son propiedad o están bajo administración federal.   
 
-- **Definición**: Son aquellos que afectan directamente a los ciudadanos en su vida cotidiana. Están tipificados en los códigos penales de cada estado.
+**Delitos del Fuero Común:**: Son aquellos que afectan directamente a los ciudadanos en su vida cotidiana. Están tipificados en los códigos penales de cada estado.   
+
 - **Ejemplos**:
     - Robo (a casa habitación, a transeúntes, de vehículos)
     - Homicidio
@@ -200,14 +200,14 @@ El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP) re
     - Delitos sexuales
 - **Jurisdicción**: Son investigados y juzgados por las autoridades de los estados.
 
-**Delitos del Fuero Federal:**
+**Delitos del Fuero Federal:**: Son aquellos que afectan a la Federación, es decir, a la nación en su conjunto. Están tipificados en el Código Penal Federal y otras leyes federales.  
 
-- **Definición**: Son aquellos que afectan a la Federación, es decir, a la nación en su conjunto. Están tipificados en el Código Penal Federal y otras leyes federales.
 - **Ejemplos**:
     - Delitos contra la salud (narcotráfico)
     - Delitos fiscales (evasión de impuestos)
     - Delitos electorales
     - Delitos contra la seguridad de la nación (terrorismo)
     - Delitos cometidos en instalaciones federales.
-    - Delitos que involucran a funcionarios federales.
-- **Jurisdicción**: Son investigados y juzgados por las autoridades federales (Fiscalía General de la República).
+    - Delitos que involucran a funcionarios federales.    
+    
+**Jurisdicción**: Son investigados y juzgados por las autoridades federales (Fiscalía General de la República).
