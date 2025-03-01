@@ -257,6 +257,9 @@ head(df, 10) %>%
           as_raw_html()
 ```
 
+<br>
+
+
 Se suman las columnas de enero hasta diciembre para tener los totales por los diferentes bienes juridicos, tipo de delito, subtipo y modalidad a nivel municipal.  
 
 Por otro lado para fines practicos, se va a trabajar con el año 2024. Para analizar la distribución de los datos de manera espacial. 
@@ -274,12 +277,49 @@ Analicemos como se conforma la base de datos
 ```{r, echo = FALSE}
 tabla <- df %>% 
           group_by(Bien.jurídico.afectado) %>% 
-           summarise(Total = n())
+           summarise(Total = sum(Total, na.rm = TRUE))
 
 tabla %>% 
  gt() %>%
   tab_header(title = "Bien jurídico afectado",
-             subtitle = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública") %>%
+             subtitle = "SESNSP") %>%
+   tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+   tab_options(heading.title.font.size = 14, 
+               heading.subtitle.font.size = 12,
+               table.font.names = "Century Gothic",
+               table.font.size = 10,
+               table.align = 'center',
+               data_row.padding = px(1)) %>%
+    tab_style(style = list(cell_text(align = "left", 
+                                     weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+      cols_width(starts_with("Bien.jurídico.afectado") ~ px(280),
+                 starts_with("Modalidad") ~ px(320),
+                 everything() ~ px(100)) %>%
+       fmt_integer(columns = c("Total"),
+                   sep_mark = " ") %>% 
+        cols_label(Total = md("**Total (2024)**"),
+                   Bien.jurídico.afectado = md("**Bien jurídico afectado**")) %>% 
+          as_raw_html()
+```
+
+
+**Tipo de delito**   
+
+Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+
+```{r, echo = FALSE}
+tabla <- df %>% 
+          group_by(Tipo.de.delito) %>% 
+           summarise(Total = sum(Total, na.rm = TRUE)) %>% 
+            arrange(desc(Total))
+
+head(tabla, 10) %>% 
+ gt() %>%
+  tab_header(title = "Tipo de delito",
+             subtitle = "SESNSP") %>%
    tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
    tab_options(heading.title.font.size = 14, 
                heading.subtitle.font.size = 12,
@@ -293,12 +333,84 @@ tabla %>%
      tab_style(style = list(cell_text(align = "left")),
                locations = list(cells_title(groups = c("subtitle")))) %>%
       cols_width(starts_with("Bien.jurídico.afectado") ~ px(200),
-                 starts_with("Modalidad") ~ px(180),
+                 starts_with("Tipo.") ~ px(380),
                  everything() ~ px(100)) %>%
        fmt_integer(columns = c("Total"),
                    sep_mark = " ") %>% 
-        cols_label(Total = md("**Total (2024)**")) %>% 
+        cols_label(Total = md("**Total (2024)**"),
+                   Tipo.de.delito = md("**Tipo de delito**")) %>% 
+          as_raw_html()
+```
+
+**Subtipo de delito**  
+
+Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+
+```{r, echo = FALSE}
+tabla <- df %>% 
+          group_by(Subtipo.de.delito) %>% 
+           summarise(Total = sum(Total, na.rm = TRUE)) %>% 
+            arrange(desc(Total))
+
+head(tabla, 10) %>% 
+ gt() %>%
+  tab_header(title = "Subtipo de delito",
+             subtitle = "SESNSP") %>%
+   tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+   tab_options(heading.title.font.size = 14, 
+               heading.subtitle.font.size = 12,
+               table.font.names = "Century Gothic",
+               table.font.size = 10,
+               table.align = 'center',
+               data_row.padding = px(1)) %>%
+    tab_style(style = list(cell_text(align = "left", 
+                                     weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+      cols_width(starts_with("Bien.jurídico.afectado") ~ px(200),
+                 starts_with("Subtipo.") ~ px(420),
+                 everything() ~ px(100)) %>%
+       fmt_integer(columns = c("Total"),
+                   sep_mark = " ") %>% 
+        cols_label(Total = md("**Total (2024)**"),
+                   Subtipo.de.delito = md("**Subtipo de delito**")) %>% 
           as_raw_html()
 ```
 
 
+**Modalidad**  
+
+Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+
+```{r, echo = FALSE}
+tabla <- df %>% 
+          group_by(Modalidad) %>% 
+           summarise(Total = sum(Total, na.rm = TRUE)) %>% 
+            arrange(desc(Total))
+
+head(tabla, 10) %>% 
+ gt() %>%
+  tab_header(title = "Modalidad",
+             subtitle = "SESNSP") %>%
+   tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+   tab_options(heading.title.font.size = 14, 
+               heading.subtitle.font.size = 12,
+               table.font.names = "Century Gothic",
+               table.font.size = 10,
+               table.align = 'center',
+               data_row.padding = px(1)) %>%
+    tab_style(style = list(cell_text(align = "left", 
+                                     weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+      cols_width(starts_with("Bien.jurídico.afectado") ~ px(200),
+                 starts_with("Modalidad") ~ px(420),
+                 everything() ~ px(100)) %>%
+       fmt_integer(columns = c("Total"),
+                   sep_mark = " ") %>% 
+        cols_label(Total = md("**Total (2024)**"),
+                   Modalidad = md("**Modalidad**")) %>% 
+          as_raw_html()
+```
