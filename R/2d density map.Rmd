@@ -225,6 +225,8 @@ df <- read.csv(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_e
 
 ```
 
+
+
 ```{r, echo = FALSE}
 #save(df, file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.RData"))
 load(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.RData"))
@@ -255,8 +257,48 @@ head(df, 10) %>%
           as_raw_html()
 ```
 
+Se suman las columnas de enero hasta diciembre para tener los totales por los diferentes bienes juridicos, tipo de delito, subtipo y modalidad a nivel municipal.  
+
+Por otro lado para fines practicos, se va a trabajar con el año 2024. Para analizar la distribución de los datos de manera espacial. 
 
 ```{r}
-
+df <- df %>% 
+         mutate(Total = rowSums(.[,10:21], na.rm = TRUE)) %>% 
+          filter(Año %in% "2024")
 ```
+
+Analicemos como se conforma la base de datos 
+
+**Bien jurídico afectado**  
+
+```{r, echo = FALSE}
+tabla <- df %>% 
+          group_by(Bien.jurídico.afectado) %>% 
+           summarise(Total = n())
+
+tabla %>% 
+ gt() %>%
+  tab_header(title = "Bien jurídico afectado",
+             subtitle = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública") %>%
+   tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+   tab_options(heading.title.font.size = 14, 
+               heading.subtitle.font.size = 12,
+               table.font.names = "Century Gothic",
+               table.font.size = 10,
+               table.align = 'center',
+               data_row.padding = px(1)) %>%
+    tab_style(style = list(cell_text(align = "left", 
+                                     weight = 'bold')),
+               locations = list(cells_title(groups = c("title")))) %>%
+     tab_style(style = list(cell_text(align = "left")),
+               locations = list(cells_title(groups = c("subtitle")))) %>%
+      cols_width(starts_with("Bien.jurídico.afectado") ~ px(200),
+                 starts_with("Modalidad") ~ px(180),
+                 everything() ~ px(100)) %>%
+       fmt_integer(columns = c("Total"),
+                   sep_mark = " ") %>% 
+        cols_label(Total = md("**Total (2024)**")) %>% 
+          as_raw_html()
+```
+
 
