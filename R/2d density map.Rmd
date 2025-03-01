@@ -418,11 +418,21 @@ head(tabla, 10) %>%
 
 ## Homicidios dolososos    
 
+Un homicidio doloso se define como la privación de la vida de una persona, donde existe la intención deliberada de causar la muerte. 
 
 Para obtener información más precisa y actualizada, te recomiendo consultar las siguientes fuentes:
   
 * Página oficial del [SESNSP](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published).
-* Informes del [INEGI](https://www.inegi.org.mx/temas/mortalidad/).
+* Informes del [INEGI](https://www.inegi.org.mx/temas/mortalidad/).  
+
+
+```{r}
+homicidios <- df %>% 
+               filter(Tipo.de.delito %in% "Homicidio") %>% 
+                group_by(CVE_MUN) %>% 
+                 summarise(Total = sum(Total, na.rm = TRUE))
+```
+
 
 ## Marco Geoestadístico Nacional (MGN) 2020
 
@@ -466,3 +476,26 @@ La función `rename()` del paquete `dplyr` permite cambiar el nombre de la colum
 shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
+
+
+## Referencias
+
+Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública. (2025). Inicio. Recuperado de: https://www.gob.mx/sesnsp
+
+## Librerías
+
+**Librerías que se usaron en el trabajo** 
+
+```{r, collapse=FALSE}
+sesion_info <- devtools::session_info()
+```
+
+```{r, echo = FALSE}
+kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(attached == TRUE)),
+                    c(package, loadedversion, source))) %>%
+   kable_classic(full_width = TRUE, html_font = "montserrat", font_size = 10) 
+```
+
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
+
+
