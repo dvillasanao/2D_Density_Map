@@ -135,4 +135,30 @@ showtext_auto()
 font_add_google("Montserrat", "montserrat")
 ```
 
-## Objetivo
+## Objetivo 
+
+
+
+## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
+
+El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`) es una institución clave en México, encargada de coordinar y ejecutar las políticas públicas en materia de seguridad pública. Su objetivo principal es fortalecer la seguridad en todo el país, trabajando en colaboración con los tres niveles de gobierno (federal, estatal y municipal).
+
+Las funciones más importantes del `SESNSP`:
+
+* **Coordinación y seguimiento:**
+    * El SESNSP actúa como eje de coordinación entre las diversas instituciones de seguridad pública, tanto a nivel federal como estatal y municipal.
+    * Da seguimiento a los acuerdos y decisiones del Consejo Nacional de Seguridad Pública.
+* **Implementación de políticas públicas:**
+    * Se encarga de diseñar e implementar estrategias y programas para prevenir el delito, fortalecer las instituciones de seguridad y mejorar la respuesta ante situaciones de emergencia.
+* **Profesionalización y equipamiento:**
+    * Promueve la capacitación y profesionalización de los cuerpos de seguridad.
+    * Impulsa la modernización del equipamiento tecnológico e infraestructura de las instituciones de seguridad.
+* **Información y datos:**
+    * Genera y difunde información estadística sobre incidencia delictiva y otros indicadores relevantes para la seguridad pública.
+    * Proporciona datos para la toma de decisiones en materia de seguridad.
+* **Prevención del delito:**
+    * Promueve la cultura de la paz y la legalidad.
+    * Desarrolla programas para la prevención social de la violencia y la delincuencia.
+* **Participación ciudadana:**
+    * Fomenta la colaboración entre la ciudadanía y las autoridades en materia de seguridad.
+
