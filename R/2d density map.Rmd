@@ -136,7 +136,21 @@ showtext_auto()
 font_add_google("Montserrat", "montserrat")
 ```
 
-## Objetivo 
+```{r, echo = FALSE, fig.height=4, fig.width=6, fig.align='center'}
+require(ggplot2)
+require(ggpubr)
+v <- ggplot(faithfuld, aes(waiting, eruptions, z = density)) + 
+      geom_contour(aes(colour = after_stat(level)), binwidth = 0.001) +
+       theme_transparent() + 
+        theme(legend.position = 'none') + 
+         scale_color_viridis_c()
+
+v
+```
+
+
+## Objetivo  
+
 
 ## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
 
@@ -477,6 +491,18 @@ shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
 
+
+### SpatialPolygonsData Frame 
+
+Se fusionan los datos del `shape_municipios` con datos estadísticos del índice de marginación a nivel municipal (`IMM_2020`), excluyendo las claves municipales (`CVE_MUN`) y asegurando que `GM_2020` se ordene de acuerdo a los grados de marginación. El resultado es `layer_municipios`, un objeto que contiene a los municipios junto con sus atributos actualizados, lo que facilita su análisis y visualización en mapas.
+
+#### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
+
+```{r, class.source = "fold-show"}
+layer_municipios <- inner_join(shape_municipios,
+                                homicidios,
+                                 by = join_by("CVE_GEO" == "CVE_MUN"))
+```
 
 ## Referencias
 
