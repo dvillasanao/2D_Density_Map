@@ -140,7 +140,7 @@ font_add_google("Montserrat", "montserrat")
 
 ## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
 
-El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`) es una institución clave en México, encargada de coordinar y ejecutar las políticas públicas en materia de seguridad pública. Su objetivo principal es fortalecer la seguridad en todo el país, trabajando en colaboración con los tres niveles de gobierno (federal, estatal y municipal).
+El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública ([`SESNSP`](https://www.gob.mx/sesnsp)) es una institución clave en México, encargada de coordinar y ejecutar las políticas públicas en materia de seguridad pública. Su objetivo principal es fortalecer la seguridad en todo el país, trabajando en colaboración con los tres niveles de gobierno (federal, estatal y municipal).
 
 Las funciones más importantes del `SESNSP`:
 
@@ -308,7 +308,7 @@ tabla %>%
 
 **Tipo de delito**   
 
-Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **tipo de delito**, dentro de la base de incidencias delictivas. 
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -344,7 +344,7 @@ head(tabla, 10) %>%
 
 **Subtipo de delito**  
 
-Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **subtipo de delito**, dentro de la base de incidencias delictivas. 
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -381,7 +381,7 @@ head(tabla, 10) %>%
 
 **Modalidad**  
 
-Solamente se muestran las primeras 10 categorías y de mayor denominación. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **modalidad**, dentro de la base de incidencias delictivas. 
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -413,4 +413,56 @@ head(tabla, 10) %>%
         cols_label(Total = md("**Total (2024)**"),
                    Modalidad = md("**Modalidad**")) %>% 
           as_raw_html()
+```
+
+
+## Homicidios dolososos    
+
+
+Para obtener información más precisa y actualizada, te recomiendo consultar las siguientes fuentes:
+  
+* Página oficial del [SESNSP](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published).
+* Informes del [INEGI](https://www.inegi.org.mx/temas/mortalidad/).
+
+## Marco Geoestadístico Nacional (MGN) 2020
+
+El **Marco Geoestadístico Nacional (MGN) 2020** del **Instituto Nacional de Estadística y Geografía (INEGI)** es un sistema de referencia geográfica que define la división territorial de México para la recopilación, análisis y presentación de información estadística. Se utiliza principalmente en censos y encuestas para garantizar la compatibilidad de datos espaciales a nivel nacional.
+
+#### **Características principales del MGN 2020:**
+
+1.  **Unidades geográficas:**
+    -   **Áreas Geoestadísticas Estatales (AGEE):** corresponden a los estados.\
+    -   **Áreas Geoestadísticas Municipales (AGEM):** coinciden con los municipios.\
+    -   **Áreas Geoestadísticas Básicas (AGEB):** subdivisiones de los municipios, utilizadas en zonas urbanas y rurales.\
+    -   **Manzanas geoestadísticas:** delimitaciones dentro de las AGEB urbanas.
+2.  **Proyección y sistema de coordenadas:**
+    -   Utiliza el **Sistema de Referencia Geodésico ITRF2008** en coordenadas geográficas con el **datum WGS84**.\
+    -   Se presenta en formato vectorial compatible con SIG (Sistemas de Información Geográfica), en formatos como **Shapefile (SHP)** y **GeoJSON**.
+
+#### Shapefile
+
+La función `readOGR` del paquete `rgdal`, extrae automáticamente la información utilizada por otros paquetes `SIG` de código abierto como QGIS y permite a R manejar una gama más amplia de formatos de datos espaciales. Esta función lee datos `OGR` y datos vectoriales, pero solamente permite manejar capas con características geométricas (no mezcla puntos, líneas o polígonos en una sola capa) y a su vez establecerá un sistema de referencia espacial si la capa tiene dichos metadatos.\
+Para leer un archivo `shapefile`, se establecen los siguientes argumentos, como `dsn`, en donde se indica el directorio que contiene los shapes y `layer` que es el nombre explícito de la capa a trabajar y dichas capas deben de ir sin la extensión `.shp`.
+
+A continuación, se lee el archivo .shp que contiene de manera integrada la división de el área geoestadística municipal `agem`.
+
+```{r,results=FALSE,class.source = "fold-show"}
+shape_estados <- readOGR(dsn ="D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos", 
+                             layer = "00ent",
+                              encoding = "UTF-8",
+                               use_iconv = TRUE)
+```
+
+```{r,results=FALSE,class.source = "fold-show"}
+shape_municipios <- readOGR(dsn ="D:/MGN/MGN 2020/MGN 2020/conjunto_de_datos", 
+                             layer = "00mun",
+                              encoding = "UTF-8",
+                               use_iconv = TRUE)
+```
+
+La función `rename()` del paquete `dplyr` permite cambiar el nombre de la columna de la clave geoestadística a nivel estatal dentro de la base de datos del shape.
+
+```{r,class.source = "fold-show"}
+shape_municipios@data <- shape_municipios@data %>%
+                          rename("CVE_GEO" = "CVEGEO")
 ```
