@@ -96,7 +96,6 @@ h3 {
 </style>
 ```
 
-
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE, 
                       cache.lazy = FALSE, class.source = "fold-show")
@@ -126,6 +125,8 @@ require(spdplyr)        #Data manipulation verbs for the sptial classes
 require(stringr)
 require(tidyverse) 
 require(unikn)          # Paleta de colores
+library(sf)
+
 ```
 
 ```{r, echo = FALSE, results=FALSE}
@@ -148,108 +149,112 @@ v <- ggplot(faithfuld, aes(waiting, eruptions, z = density)) +
 v
 ```
 
+## Objetivo
 
-## Objetivo  
+Los **contornos de una estimación de densidad en 2D** (`Contours of a 2D density estimate`) son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas.
 
-Los **contornos de una estimación de densidad en 2D** (`Contours of a 2D density estimate`) son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas. 
+Su principal función consiste en mostrar la concentración de puntos en conjuntos de datos bidimensionales, lo que resulta particularmente útil cuando se trabaja con grandes volúmenes de información. Estos contornos facilitan la identificación de áreas con mayor densidad de observaciones en gráficos de dispersión, solucionando el problema de visualización que surge cuando hay numerosos puntos solapados.
 
-Su principal función consiste en mostrar la concentración de puntos en conjuntos de datos bidimensionales, lo que resulta particularmente útil cuando se trabaja con grandes volúmenes de información. Estos contornos facilitan la identificación de áreas con mayor densidad de observaciones en gráficos de dispersión, solucionando el problema de visualización que surge cuando hay numerosos puntos solapados. 
+Además de visualizar distribuciones, estos contornos permiten detectar patrones y estructuras subyacentes en los datos, revelando agrupaciones naturales y la forma general de la distribución, ya sea unimodal, multimodal o con otras características distintivas. Una ventaja adicional es su capacidad para facilitar la comparación entre diferentes subconjuntos de datos, permitiendo superponer contornos en gráficos para analizar diferencias entre distintos grupos o categorías.   
 
-Además de visualizar distribuciones, estos contornos permiten detectar patrones y estructuras subyacentes en los datos, revelando agrupaciones naturales y la forma general de la distribución, ya sea unimodal, multimodal o con otras características distintivas. Una ventaja adicional es su capacidad para facilitar la comparación entre diferentes subconjuntos de datos, permitiendo superponer contornos en gráficos para analizar diferencias entre distintos grupos o categorías. 
+### **📌 Usos principales de los contornos de densidad en 2D para datos de homicidios:**   
 
-### **📌 Usos principales de los contornos de densidad en 2D para datos de homicidios:**
-  
-1. **📍 Identificación de zonas con alta incidencia de homicidios**  
-- Permiten encontrar **"hotspots"** o zonas donde los homicidios son más frecuentes.  
-- Útil para la **toma de decisiones en seguridad pública** y asignación de recursos policiales.  
+1.  **📍 Identificación de zonas con alta incidencia de homicidios**
 
-2. **⏳ Análisis temporal y espacial**  
-- Si se usa con **coordenadas geográficas** (latitud y longitud), los contornos mostrarán las áreas más afectadas.  
-- Si se usa con **fechas y horas**, se pueden detectar periodos del día o del año con mayor incidencia.  
+    -   Permiten encontrar **"hotspots"** o zonas donde los homicidios son más frecuentes.\
 
-3. **🕵️‍♂️ Detección de patrones y tendencias criminales**  
-- Ayuda a identificar si los homicidios siguen una distribución aleatoria o si hay **patrones estructurados**.  
-- Se puede comparar la densidad en diferentes años para analizar la evolución del crimen en el tiempo.  
+    -   Útil para la **toma de decisiones en seguridad pública** y asignación de recursos policiales.
 
-4. **⚖️ Comparación de diferentes regiones o tipos de homicidios**  
-- Permite superponer los contornos de densidad de diferentes tipos de homicidios (por arma de fuego, por arma blanca, etc.)  
-- Se pueden comparar ciudades o regiones para ver dónde es más grave el problema.   
+2.  **⏳ Análisis temporal y espacial**\
 
-## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
+    -   Si se usa con **coordenadas geográficas** (latitud y longitud), los contornos mostrarán las áreas más afectadas.\
+
+    -   Si se usa con **fechas y horas**, se pueden detectar periodos del día o del año con mayor incidencia.
+
+3.  **🕵️‍♂️ Detección de patrones y tendencias criminales**\
+
+    -   Ayuda a identificar si los homicidios siguen una distribución aleatoria o si hay **patrones estructurados**. 
+
+    -   Se puede comparar la densidad en diferentes años para analizar la evolución del crimen en el tiempo.
+
+4.  **⚖️ Comparación de diferentes regiones o tipos de homicidios**\
+
+    -   Permite superponer los contornos de densidad de diferentes tipos de homicidios (por arma de fuego, por arma blanca, etc.)\
+    -   Se pueden comparar ciudades o regiones para ver dónde es más grave el problema.
+
+## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)
 
 El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública ([`SESNSP`](https://www.gob.mx/sesnsp)) es una institución clave en México, encargada de coordinar y ejecutar las políticas públicas en materia de seguridad pública. Su objetivo principal es fortalecer la seguridad en todo el país, trabajando en colaboración con los tres niveles de gobierno (federal, estatal y municipal).
 
 Las funciones más importantes del `SESNSP`:
 
-* **Coordinación y seguimiento:**
-    * El SESNSP actúa como eje de coordinación entre las diversas instituciones de seguridad pública, tanto a nivel federal como estatal y municipal.
-    * Da seguimiento a los acuerdos y decisiones del Consejo Nacional de Seguridad Pública.
-* **Implementación de políticas públicas:**
-    * Se encarga de diseñar e implementar estrategias y programas para prevenir el delito, fortalecer las instituciones de seguridad y mejorar la respuesta ante situaciones de emergencia.
-* **Profesionalización y equipamiento:**
-    * Promueve la capacitación y profesionalización de los cuerpos de seguridad.
-    * Impulsa la modernización del equipamiento tecnológico e infraestructura de las instituciones de seguridad.
-* **Información y datos:**
-    * Genera y difunde información estadística sobre incidencia delictiva y otros indicadores relevantes para la seguridad pública.
-    * Proporciona datos para la toma de decisiones en materia de seguridad.
-* **Prevención del delito:**
-    * Promueve la cultura de la paz y la legalidad.
-    * Desarrolla programas para la prevención social de la violencia y la delincuencia.
-* **Participación ciudadana:**
-    * Fomenta la colaboración entre la ciudadanía y las autoridades en materia de seguridad.
+-   **Coordinación y seguimiento:**
+    -   El SESNSP actúa como eje de coordinación entre las diversas instituciones de seguridad pública, tanto a nivel federal como estatal y municipal.
+    -   Da seguimiento a los acuerdos y decisiones del Consejo Nacional de Seguridad Pública.
+-   **Implementación de políticas públicas:**
+    -   Se encarga de diseñar e implementar estrategias y programas para prevenir el delito, fortalecer las instituciones de seguridad y mejorar la respuesta ante situaciones de emergencia.
+-   **Profesionalización y equipamiento:**
+    -   Promueve la capacitación y profesionalización de los cuerpos de seguridad.
+    -   Impulsa la modernización del equipamiento tecnológico e infraestructura de las instituciones de seguridad.
+-   **Información y datos:**
+    -   Genera y difunde información estadística sobre incidencia delictiva y otros indicadores relevantes para la seguridad pública.
+    -   Proporciona datos para la toma de decisiones en materia de seguridad.
+-   **Prevención del delito:**
+    -   Promueve la cultura de la paz y la legalidad.
+    -   Desarrolla programas para la prevención social de la violencia y la delincuencia.
+-   **Participación ciudadana:**
+    -   Fomenta la colaboración entre la ciudadanía y las autoridades en materia de seguridad.
 
-
-### Fuentes de información    
+### Fuentes de información
 
 El Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP) recopila y publica información sobre incidencia delictiva a través de un proceso sistemático y riguroso que involucra a diversas fuentes oficiales y metodologías estadísticas estandarizadas. Esta institución gubernamental se encarga de centralizar, procesar y difundir los datos relacionados con la seguridad pública en todo el territorio mexicano, proporcionando así una visión integral de la situación delictiva en el país. Aquí te explico detalladamente cómo llevan a cabo este importante proceso de recolección y publicación de información:
 
-- **Fiscalías y Procuradurías:**
-    - Las fiscalías generales de los estados y la Fiscalía General de la República (FGR) proporcionan los datos detallados y sistemáticos sobre los delitos registrados en sus investigaciones, constituyendo una de las principales fuentes de información estadística a nivel nacional.
-    - Esta información abarca tanto las averiguaciones previas del sistema tradicional como las carpetas de investigación iniciadas bajo el nuevo sistema de justicia penal acusatorio, lo que permite una visión completa del panorama delictivo documentado oficialmente.
-- **Registros administrativos:**
-    - El SESNSP también utiliza y analiza datos provenientes de diversos registros administrativos de otras instituciones gubernamentales, como las corporaciones policiales estatales y municipales, así como los centros de atención de llamadas de emergencia (911), que complementan la información obtenida de las fiscalías para ofrecer un panorama más integral de la situación delictiva. 
-    
-    
-### Metodología:   
+-   **Fiscalías y Procuradurías:**
+    -   Las fiscalías generales de los estados y la Fiscalía General de la República (FGR) proporcionan los datos detallados y sistemáticos sobre los delitos registrados en sus investigaciones, constituyendo una de las principales fuentes de información estadística a nivel nacional.
+    -   Esta información abarca tanto las averiguaciones previas del sistema tradicional como las carpetas de investigación iniciadas bajo el nuevo sistema de justicia penal acusatorio, lo que permite una visión completa del panorama delictivo documentado oficialmente.
+-   **Registros administrativos:**
+    -   El SESNSP también utiliza y analiza datos provenientes de diversos registros administrativos de otras instituciones gubernamentales, como las corporaciones policiales estatales y municipales, así como los centros de atención de llamadas de emergencia (911), que complementan la información obtenida de las fiscalías para ofrecer un panorama más integral de la situación delictiva.
 
-- **Registro de delitos:**
-    - La incidencia delictiva se refiere específicamente a la presunta ocurrencia de delitos formalmente registrados en las investigaciones oficiales, siguiendo protocolos estandarizados que permiten la comparabilidad de los datos a nivel nacional e internacional.
-    - El SESNSP clasifica meticulosamente los delitos en diferentes categorías y subcategorías, tanto del fuero común como del fuero federal, utilizando criterios uniformes que facilitan el análisis estadístico y la identificación de patrones delictivos en diferentes regiones del país. 
-    
-    
-- **Publicación de datos:**
-    - El SESNSP publica periódicamente los datos compilados de incidencia delictiva en su sitio web oficial, a través de informes mensuales detallados y compendios anuales que permiten visualizar tendencias y comportamientos delictivos a lo largo del tiempo.
-    - También proporciona acceso a bases de datos abiertos en formatos compatibles con diferentes programas estadísticos para que la ciudadanía, investigadores, organizaciones civiles y otras instituciones gubernamentales puedan acceder, descargar y analizar la información de acuerdo con sus necesidades específicas.
-    - En su página oficial se pueden encontrar los datos desagregados por estado, municipio y región geográfica, y también se puede consultar información especializada sobre delitos federales y comunes, incluyendo variables como modalidad, tipo de delito, bienes jurídicos afectados y características demográficas generales. 
-    
-### Tipos de delitos 
+### Metodología:
 
-La diferencia fundamental está en el bien jurídico protegido: en el fuero común, se protege a los ciudadanos individualmente, salvaguardando sus derechos personales y patrimoniales dentro del ámbito local; en el fuero federal, se protege a la nación como entidad soberana, incluyendo sus instituciones, la seguridad nacional y el orden constitucional.   
+-   **Registro de delitos:**
+    -   La incidencia delictiva se refiere específicamente a la presunta ocurrencia de delitos formalmente registrados en las investigaciones oficiales, siguiendo protocolos estandarizados que permiten la comparabilidad de los datos a nivel nacional e internacional.
+    -   El SESNSP clasifica meticulosamente los delitos en diferentes categorías y subcategorías, tanto del fuero común como del fuero federal, utilizando criterios uniformes que facilitan el análisis estadístico y la identificación de patrones delictivos en diferentes regiones del país.
+-   **Publicación de datos:**
+    -   El SESNSP publica periódicamente los datos compilados de incidencia delictiva en su sitio web oficial, a través de informes mensuales detallados y compendios anuales que permiten visualizar tendencias y comportamientos delictivos a lo largo del tiempo.
+    -   También proporciona acceso a bases de datos abiertos en formatos compatibles con diferentes programas estadísticos para que la ciudadanía, investigadores, organizaciones civiles y otras instituciones gubernamentales puedan acceder, descargar y analizar la información de acuerdo con sus necesidades específicas.
+    -   En su página oficial se pueden encontrar los datos desagregados por estado, municipio y región geográfica, y también se puede consultar información especializada sobre delitos federales y comunes, incluyendo variables como modalidad, tipo de delito, bienes jurídicos afectados y características demográficas generales.
 
-Algunos delitos pueden ser del fuero común o federal dependiendo de las circunstancias específicas del caso, como la participación de funcionarios federales, el lugar donde se comete el delito (si ocurre en instalaciones federales), la naturaleza transnacional del mismo, o si afecta bienes o recursos que son propiedad o están bajo administración federal.   
+### Tipos de delitos
 
-**Delitos del Fuero Común:**: Son aquellos que afectan directamente a los ciudadanos en su vida cotidiana. Están tipificados en los códigos penales de cada estado.   
+La diferencia fundamental está en el bien jurídico protegido: en el fuero común, se protege a los ciudadanos individualmente, salvaguardando sus derechos personales y patrimoniales dentro del ámbito local; en el fuero federal, se protege a la nación como entidad soberana, incluyendo sus instituciones, la seguridad nacional y el orden constitucional.
 
-- **Ejemplos**:
-    - Robo (a casa habitación, a transeúntes, de vehículos)
-    - Homicidio
-    - Lesiones
-    - Violencia familiar
-    - Delitos sexuales
-- **Jurisdicción**: Son investigados y juzgados por las autoridades de los estados.
+Algunos delitos pueden ser del fuero común o federal dependiendo de las circunstancias específicas del caso, como la participación de funcionarios federales, el lugar donde se comete el delito (si ocurre en instalaciones federales), la naturaleza transnacional del mismo, o si afecta bienes o recursos que son propiedad o están bajo administración federal.
 
-**Delitos del Fuero Federal:**: Son aquellos que afectan a la Federación, es decir, a la nación en su conjunto. Están tipificados en el Código Penal Federal y otras leyes federales.  
+**Delitos del Fuero Común:**: Son aquellos que afectan directamente a los ciudadanos en su vida cotidiana. Están tipificados en los códigos penales de cada estado.
 
-- **Ejemplos**:
-    - Delitos contra la salud (narcotráfico)
-    - Delitos fiscales (evasión de impuestos)
-    - Delitos electorales
-    - Delitos contra la seguridad de la nación (terrorismo)
-    - Delitos cometidos en instalaciones federales.
-    - Delitos que involucran a funcionarios federales.    
-    
-**Jurisdicción**: Son investigados y juzgados por las autoridades federales (Fiscalía General de la República).
+-   **Ejemplos**:
+    -   Robo (a casa habitación, a transeúntes, de vehículos)
+    -   Homicidio
+    -   Lesiones
+    -   Violencia familiar
+    -   Delitos sexuales
+-   **Jurisdicción**: Son investigados y juzgados por las autoridades de los estados.
 
+**Delitos del Fuero Federal:**: Son aquellos que afectan a la Federación, es decir, a la nación en su conjunto. Están tipificados en el Código Penal Federal y otras leyes federales.
+
+-   **Ejemplos**:
+    -   Delitos contra la salud (narcotráfico)
+    -   Delitos fiscales (evasión de impuestos)
+    -   Delitos electorales
+    -   Delitos contra la seguridad de la nación (terrorismo)
+    -   Delitos cometidos en instalaciones federales.
+    -   Delitos que involucran a funcionarios federales.
+
+**Jurisdicción**: Son investigados y juzgados por las autoridades federales (Fiscalía General de la República).   
+
+
+Se lee la base de datos de delitos municipales descargada del SESNSP (Última actualización al 20 de febrero de 2025), se renombran claves geográficas y se estandarizan en un formato para que las claves de entidad y municipio tengan el número correcto de dígitos.   
 
 ```{r, eval = FALSE}
 df <- read.csv(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.csv"), 
@@ -261,8 +266,6 @@ df <- read.csv(file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_e
               CVE_MUN = str_pad(.$CVE_MUN, width = 5, side = "left", pad = "0"))
 
 ```
-
-
 
 ```{r, echo = FALSE}
 #save(df, file = paste0(here::here(), "/Bases/Municipal-Delitos-2015-2025_ene2025.RData"))
@@ -296,10 +299,9 @@ head(df, 10) %>%
 
 <br>
 
+Se suman las columnas de enero hasta diciembre para tener los totales por los diferentes bienes juridicos, tipo de delito, subtipo y modalidad a nivel municipal.
 
-Se suman las columnas de enero hasta diciembre para tener los totales por los diferentes bienes juridicos, tipo de delito, subtipo y modalidad a nivel municipal.  
-
-Por otro lado para fines practicos, se va a trabajar con el año 2024. Para analizar la distribución de los datos de manera espacial. 
+Para analizar la distribución de los datos de manera espacial. Se suman los valores de las columnas que contienen las incidencias delictivas de enero a diciembre en cada fila, se almacena el resultado en `Total`, y luego filtra los datos para el año `2024`; para fines practicos.      
 
 ```{r}
 df <- df %>% 
@@ -307,9 +309,9 @@ df <- df %>%
           filter(Año %in% "2024")
 ```
 
-Analicemos como se conforma la base de datos 
+Analicemos como se conforma la base de datos de acuerdo a las diversas categorías. 
 
-**Bien jurídico afectado**  
+**Bien jurídico afectado**
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -342,10 +344,9 @@ tabla %>%
           as_raw_html()
 ```
 
+**Tipo de delito**
 
-**Tipo de delito**   
-
-Se muestran las primeras 10 categorías y de mayor denominación de la categoría **tipo de delito**, dentro de la base de incidencias delictivas. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **tipo de delito**, dentro de la base de incidencias delictivas.
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -379,9 +380,9 @@ head(tabla, 10) %>%
           as_raw_html()
 ```
 
-**Subtipo de delito**  
+**Subtipo de delito**
 
-Se muestran las primeras 10 categorías y de mayor denominación de la categoría **subtipo de delito**, dentro de la base de incidencias delictivas. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **subtipo de delito**, dentro de la base de incidencias delictivas.
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -415,10 +416,9 @@ head(tabla, 10) %>%
           as_raw_html()
 ```
 
+**Modalidad**
 
-**Modalidad**  
-
-Se muestran las primeras 10 categorías y de mayor denominación de la categoría **modalidad**, dentro de la base de incidencias delictivas. 
+Se muestran las primeras 10 categorías y de mayor denominación de la categoría **modalidad**, dentro de la base de incidencias delictivas.
 
 ```{r, echo = FALSE}
 tabla <- df %>% 
@@ -452,37 +452,34 @@ head(tabla, 10) %>%
           as_raw_html()
 ```
 
+## Homicidios dolososos
 
-## Homicidios dolososos    
-
-Un homicidio doloso se define como la privación de la vida de una persona, donde existe la intención deliberada de causar la muerte. 
+Un homicidio doloso se define como la privación de la vida de una persona, donde existe la intención deliberada de causar la muerte.
 
 Para obtener información más precisa y actualizada, te recomiendo consultar las siguientes fuentes:
-  
-* Página oficial del [SESNSP](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published).
-* Informes del [INEGI](https://www.inegi.org.mx/temas/mortalidad/).  
 
+-   Página oficial del [SESNSP](https://www.gob.mx/sesnsp/acciones-y-programas/datos-abiertos-de-incidencia-delictiva?state=published).
+-   Informes del [INEGI](https://www.inegi.org.mx/temas/mortalidad/).
 
 ```{r}
 homicidios <- df %>% 
-               filter(Tipo.de.delito %in% "Homicidio")  %>% 
+               filter(Subtipo.de.delito %in% "Homicidio doloso") %>% 
                 group_by(CVE_MUN) %>% 
                  summarise(Total = sum(Total, na.rm = TRUE))
 ```
 
-A continuación, se presentan los primeros 10 estados con mayor número de incidencias delictiva (`Homicidios dolosos`).  
+A continuación, se presentan los estados con mayor a menor número de incidencias delictiva (`Homicidios dolosos`).
 
 ```{r, echo = FALSE}
 require(gt)
 
 df %>% 
- filter(Tipo.de.delito %in% "Homicidio")  %>% 
+ filter(Subtipo.de.delito %in% "Homicidio doloso") %>% 
   group_by(Entidad) %>% 
    summarise(Total = sum(Total, na.rm = TRUE))%>% 
     arrange(desc(Total)) %>% 
-     head(. , 15) %>%
       gt() %>%
-       tab_header(title = "Reportes de incidencia homicidios a nivel municipal",
+       tab_header(title = "Reportes de incidencia homicidios dolosos a nivel municipal",
                   subtitle = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública") %>%
         tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
         tab_options(heading.title.font.size = 14, 
@@ -496,12 +493,11 @@ df %>%
                     locations = list(cells_title(groups = c("title")))) %>%
           tab_style(style = list(cell_text(align = "left")),
                     locations = list(cells_title(groups = c("subtitle")))) %>%
-            cols_width(starts_with("Bien.jurídico.afectado") ~ px(180),
+            cols_width(starts_with("Entidad") ~ px(180),
                        starts_with("Modalidad") ~ px(180),
                        everything() ~ px(100)) %>%
              as_raw_html()
 ```
-
 
 ## Marco Geoestadístico Nacional (MGN) 2020
 
@@ -546,10 +542,9 @@ shape_municipios@data <- shape_municipios@data %>%
                           rename("CVE_GEO" = "CVEGEO")
 ```
 
+### SpatialPolygonsData Frame
 
-### SpatialPolygonsData Frame 
-
-Se fusionan los datos del `shape_municipios` con datos estadísticos del índice de marginación a nivel municipal (`IMM_2020`), excluyendo las claves municipales (`CVE_MUN`) y asegurando que `GM_2020` se ordene de acuerdo a los grados de marginación. El resultado es `layer_municipios`, un objeto que contiene a los municipios junto con sus atributos actualizados, lo que facilita su análisis y visualización en mapas.
+Se fusionan los datos del `shape_municipios` con datos estadísticos de los totales de homicidios dolosos a nivel municipal. El resultado es `layer_municipios`, un objeto que contiene a los municipios junto con sus atributos actualizados, lo que facilita su análisis y visualización en mapas.
 
 #### $$SpatialPolygons \Rightarrow SpatialPolygons + Datos$$
 
@@ -561,7 +556,7 @@ layer_municipios <- inner_join(shape_municipios,
 
 ## Centroides
 
-La función `coordinates()` extrae las coordenadas de los centroides de los polígonos en $(x,y)$ de la base de datos espacial y la almacenamos en la variable `coords`, para su posterior uso en el código.
+La función `coordinates()` extrae las coordenadas de los centroides de los polígonos en $(x,y)$ de la base de datos espacial y la almacenamos en la variable `coords`, para su posterior uso en el código. Además se combina con información clave para análisis y visualización geoespacial.
 
 ```{r}
 # Extrayendo coordenadas desde la base de datos espaciales.
@@ -572,6 +567,8 @@ coords = coordinates(layer_municipios) %>%
             cbind(layer_municipios@data[, c("CVE_GEO", "CVE_ENT", "Total")])  
 ```
 
+Se crea un data.frame con el nombre de `homicidios`, donde se seleccionan solo las filas donde `Subtipo.de.delito` sea `Homicidio doloso` a nivel municipal. Se une con las coordenadas municipales (`coords`)
+
 ```{r}
 homicidios <- df %>% 
                filter(Subtipo.de.delito %in% "Homicidio doloso") %>% 
@@ -581,88 +578,116 @@ homicidios <- df %>%
                    filter(Total > 0)
 ```
 
-
-## Mapa de homicidios  
+## Mapa de homicidios
 
 ```{r}
 p <- ggplot() + 
       layer_spatial(layer_municipios, aes(fill = Total), color = "transparent") + 
        layer_spatial(shape_estados, fill = "transparent", color = "black") + 
         theme_bw() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+         theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.subtitle = element_text(size = 12, hjust = 0.15, family = "montserrat"),
+               plot.caption = element_text(size = 12, hjust = 0, vjust = 1, family = "montserrat"), 
                legend.key.size = unit(0.5, "cm"),
-               legend.text = element_text(size = 12, family = "montserrat"), 
-               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.text = element_text(size = 10, family = "montserrat"), 
+               legend.title = element_text(size = 11, hjust = 0.5, family = "montserrat", face = "bold"),
                legend.position = "right"
                ) + 
-          scale_fill_viridis_c(option = "A", begin = 0.3, end = 1, direction = -1) +
+          scale_fill_viridis_c(option = "A", begin = 0.3, end = 0.95, direction = -1) +
            scale_color_manual(values = c("#BDBDBD")) + 
             guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
-     labs(title = "Mapa coroplético de homicidios dolosos a nivel municipal",
+     labs(title = stringr::str_wrap("Mapa cloroplético de homicidios dolosos a nivel municipal", 80),
+          subtitle = stringr::str_wrap("Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP)", 180),
            fill = stringr::str_wrap("Homicidios dolosos", 10), 
             caption = expression(paste("Elaboración propia")))
 p
 ```
 
-## 2D Density Map   
+### Homicidios dolosos (Gráfico de dispersión)  
+
+Esta trama de código de `ggplot2` se usa para dimensionar la magnitud de los homicidios dolosos a nivel municipal en un mapa. En la que los círculos son proporcionales a la magnitud de homicidios dolosos regitrados en el 2024.   
+
 
 ```{r}
 p <- ggplot() + 
       layer_spatial(shape_estados, fill = "transparent", color = "black") + 
        geom_point(data = coords, aes(x = lon, y = lat, size = Total, color = Total), alpha = 0.6, shape = 21) +
-        #stat_density_2d_filled(data = coords, aes(x = lon, y = lat, fill = ..Total..), alpha = 0.6) + 
         theme_bw() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+         theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.subtitle = element_text(size = 12, hjust = 0.15, family = "montserrat"),
                legend.key.size = unit(0.5, "cm"),
-               legend.text = element_text(size = 12, family = "montserrat"), 
-               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.text = element_text(size = 10, family = "montserrat"), 
+               legend.title = element_text(size = 11, hjust = 0.5, family = "montserrat", face = "bold"),
                legend.position = "right"
                ) + 
           guides(size = FALSE, alpha = FALSE) + 
-          scale_fill_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
-          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral")))
-
+           scale_fill_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+            scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+             labs(title = stringr::str_wrap("Magnitud de homicidios dolosos a nivel municipal", 80),
+                  subtitle = stringr::str_wrap("Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP)", 180),
+                  fill = stringr::str_wrap("Homicidios dolosos", 10), 
+                  caption = expression(paste("Elaboración propia")), 
+                  x = "", 
+                  y = "") 
 p
 ```
+## 2D Density Map
+
+Se expanden los datos de homicidios y se genera un conjunto de observaciones donde cada municipio con homicidios dolosos se repite según el total de homicidios en ese municipio. Esto es importante, ya que los mapas de contornos contemplan las densidades, es decir, se contempla el número de repeticiones de sucesos delictivos en la zona y de esta manera determinar el ancho de los contornos en los mapas de calor.
 
 ```{r}
 homicidios <- coords %>% 
                filter(Total > 0) %>% 
                 uncount(Total)
-```
+``` 
+
+
+- **Mapas de contornos de densidad 2D** son ideales cuando se busca **identificar la concentración espacial y los patrones de dispersión** de un fenómeno, como homicidios, y son más efectivos cuando los datos no siguen fronteras geográficas claras.
+- **Mapas cloropléticos** son útiles para **resumir y comparar agregados de datos** en áreas geográficas predeterminadas (municipios, estados), pero pierden detalles sobre la **distribución interna** de los eventos.
 
 
 ```{r}
-values <- colorRampPalette(c("white", "orange", "red"))(10)
+#Paleta de colores
+values <- colorRampPalette(c("white", "orange", "red"))(12)
 
 p <- ggplot() + 
       layer_spatial(shape_estados, fill = "transparent", color = "black") + 
-        stat_density_2d_filled(data = homicidios, aes(x = lon, y = lat, fill = ..level..), alpha = 0.6) + 
+       stat_density_2d_filled(data = homicidios, aes(x = lon, y = lat, fill = ..level..), alpha = 0.6) + 
         theme_bw() + 
-         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+         theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.subtitle = element_text(size = 12, hjust = 0.15, family = "montserrat"),
                legend.key.size = unit(0.5, "cm"),
-               legend.text = element_text(size = 12, family = "montserrat"), 
-               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
-               legend.position = "right"
+               legend.text = element_text(size = 10, family = "montserrat"), 
+               legend.title = element_text(size = 11, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.position = "none"
                ) + 
           guides(size = FALSE, alpha = FALSE) + 
-          scale_fill_manual(values = values) + 
-          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral")))
-
+           scale_fill_manual(values = values) + 
+            scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+             labs(title = stringr::str_wrap("Mapa de densidades de homicidios dolosos a nivel municipal", 80),
+                  subtitle = stringr::str_wrap("Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP)", 180),
+                  fill = stringr::str_wrap("Homicidios dolosos", 10), 
+                  caption = expression(paste("Elaboración propia")), 
+                  x = "", 
+                  y = "") 
 p
 ```
 
+**Ventajas de los mapas de contornos de densidad:**     
+
+- Muestran representación continua de densidad usando líneas de contorno o colores
+- Mejor manejo de la dispersión de datos, capturando patrones complejos especialmente en áreas pequeñas
+- Permiten identificar "clusters" o áreas de alta concentración de eventos
+- Más eficaces para representar datos distribuidos de manera no uniforme
+- Visualización intuitiva de la variabilidad espacial mediante colores y contornos    
+
+
+### Casos específicos   
+
+
+A continuación se genera un mapa combinado de las áreas de homicidios dolosos en los estados de 09 (`Ciudad de México`), 15 (`Estado de México`) y 13 (`Hidalgo`), cuyos municipios en su mayoría recaen en la Zona Metropolitana del Valle de México (`ZMVM`). El mapa visualiza tanto puntos específicos de homicidios como densidad espacial de homicidios dentro de esos estados.
+
 ```{r}
-library(ggplot2)
-library(sf)
-library(ggspatial)
-library(RColorBrewer)
-
-shp_municipios <- st_as_sf(layer_municipios)  
-
 capas_estados <- shape_estados %>%
                   sp::spChFIDs(., str_pad(shape_estados@data$CVEGEO, 2, "left", pad = "0")) %>%
                    fortify(., id = "CVE_GEO")
@@ -676,33 +701,52 @@ limites <- capas_estados %>%
  
 p <- ggplot() + 
       layer_spatial(shape_municipios, 
-                     fill = "transparent", 
-                      size = 0.5,
-                      color = "#919191") + 
+                    fill = "transparent", 
+                    size = 0.5,
+                    color = "#919191") + 
        layer_spatial(shape_estados, 
-                      fill = "transparent", 
-                       size = 5,
-                       color = "black") + 
+                     fill = "transparent", 
+                     size = 5,
+                     color = "black") + 
         geom_point(data = coords, aes(x = lon, y = lat, color = Total, size = Total), alpha = 0.6) +
          stat_density_2d_filled(data = homicidios %>%
-                                 filter(CVE_ENT == c("09", "15", "13")), aes(x = lon, y = lat, fill = ..level..), color = "#919191", alpha = 0.6) + 
-          theme_bw() + 
-           theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
-                 legend.key.size = unit(0.5, "cm"),
-                 legend.text = element_text(size = 12, family = "montserrat"), 
-                 legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
-                 legend.position = "right"
-                 ) + 
-          guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
-          scale_fill_viridis_d(option = "magma", direction = -1, begin = 0.5, end = 1) +  # Para densidad
-          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
-            coord_sf(xlim = c(limites$min.x, limites$max.x),
-                     ylim = c(limites$min.y, limites$max.y)) 
+                                        filter(CVE_ENT == c("09", "15", "13")), 
+                                aes(x = lon, y = lat, fill = ..level..), 
+                                color = "#919191", 
+                                alpha = 0.6) + 
+           theme_bw() + 
+            theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+                  plot.subtitle = element_text(size = 12, hjust = 0.15, family = "montserrat"),
+                  legend.key.size = unit(0.5, "cm"),
+                  legend.text = element_text(size = 10, family = "montserrat"), 
+                  legend.title = element_text(size = 11, hjust = 0.5, family = "montserrat", face = "bold"),
+                  legend.position = "right"
+                  ) + 
+             guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
+              scale_fill_viridis_d(option = "magma", direction = -1, begin = 0.5, end = 1) +  # Para densidad
+               scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+                coord_sf(xlim = c(limites$min.x, limites$max.x),
+                         ylim = c(limites$min.y, limites$max.y)) + 
+                 labs(title = stringr::str_wrap("Mapa de densidades de homicidios dolosos en la ZMVM", 80),
+                      subtitle = stringr::str_wrap("Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP)", 180),
+                      fill = stringr::str_wrap("Homicidios dolosos", 10), 
+                      caption = expression(paste("Elaboración propia")), 
+                      x = "", 
+                      y = "") 
 
 p
 ```
 
+
+**Propósito del mapa generado:**  
+
+El mapa resultante tiene como objetivo visualizar la distribución espacial de los homicidios dolosos en tres estados de México (Ciudad de México, Estado de México e Hidalgo):
+
+- **Puntos de homicidios**: Muestran los municipios donde se han registrado homicidios dolosos. Los puntos son dimensionados y coloreados en función del número de homicidios.
+
+- **Densidad 2D**: Se representa la concentración de homicidios a lo largo del espacio geográfico. Las áreas más oscuras indican zonas con mayor densidad de homicidios, mientras que las áreas más claras tienen menor concentración.
+
+- **Enfoque específico**: El mapa está enfocado en tres estados específicos, lo que permite analizar la distribución de homicidios en una región determinada, lo cual es útil para estudios de seguridad, políticas públicas y análisis de patrones espaciales.
 
 ```{r}
 library(ggplot2)
@@ -764,11 +808,11 @@ p
 
 ## Referencias
 
-Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública. (2025). Inicio. Recuperado de: https://www.gob.mx/sesnsp
+Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública. (2025). Inicio. Recuperado de: <https://www.gob.mx/sesnsp>
 
 ## Librerías
 
-**Librerías que se usaron en el trabajo** 
+**Librerías que se usaron en el trabajo**
 
 ```{r, collapse=FALSE}
 sesion_info <- devtools::session_info()
@@ -781,5 +825,3 @@ kable(dplyr::select(tibble::as_tibble(sesion_info$packages %>% dplyr::filter(att
 ```
 
 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img src="https://i.creativecommons.org/l/by/4.0/88x31.png" alt="Creative Commons Licence" style="border-width:0"/></a><br />This work by [**Diana Villasana Ocampo**]{xmlns:cc="http://creativecommons.org/ns#" property="cc:attributionName"} is licensed under a <a rel="license" href="http://creativecommons.org/licenses/by/4.0/">Creative Commons Attribution 4.0 International License</a>.
-
-
