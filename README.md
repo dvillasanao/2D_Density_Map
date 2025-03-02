@@ -78,7 +78,7 @@ install.packages(c("tidyverse", "sf", "ggplot2", "ggspatial", "dplyr", "stringr"
 ## Resultados
 
 **Enlace**:
-<https://dvillasanao.github.io/Correlaciones_espaciales/Output/Correlaciones-a-nivel-municipal.html>
+<https://dvillasanao.github.io/2D_Density_Map/Output/2d-density-map.html>
 
 ## Código de Conducta
 
