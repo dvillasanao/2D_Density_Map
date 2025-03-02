@@ -603,6 +603,12 @@ p <- ggplot() +
 p
 ```
 
+```{r, echo = FALSE, eval = FALSE}
+path = "Output/Mapa cloropletico de homicidios dolosos.pdf"
+ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
+```
+
+
 ### Homicidios dolosos (Gráfico de dispersión)  
 
 Esta trama de código de `ggplot2` se usa para dimensionar la magnitud de los homicidios dolosos a nivel municipal en un mapa. En la que los círculos son proporcionales a la magnitud de homicidios dolosos regitrados en el 2024.   
@@ -632,6 +638,10 @@ p <- ggplot() +
 p
 ```
 
+```{r, echo = FALSE, eval = FALSE}
+path = "Output/Mapa de puntos de homicidios dolosos.pdf"
+ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
+```
 
 
 ## 2D Density Map    
@@ -674,6 +684,10 @@ p <- ggplot() +
                   x = "", 
                   y = "") 
 p
+```
+```{r, echo = FALSE, eval = FALSE}
+path = "Output/Mapa de calor de homicidios dolosos.pdf"
+ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
 ```
 
 **Ventajas de los mapas de contornos de densidad:**     
@@ -804,9 +818,13 @@ p <- ggplot() +
                      x = "", 
                      y = "") 
 
-
 p
 ```
+```{r, echo = FALSE, eval = FALSE}
+path = "Output/Mapa de calor de homicidios dolosos_Guanajuato.pdf"
+ggexport(p, filename = path ,width = 10, height = 10, device = "cairo")
+```
+
 
 ## Referencias
 
