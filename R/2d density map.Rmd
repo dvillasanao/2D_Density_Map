@@ -151,7 +151,7 @@ v
 
 ## Objetivo
 
-Los **contornos de una estimación de densidad en 2D** (`Contours of a 2D density estimate`) son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas.
+Los **contornos de estimaciones bidimensionales** (`Contours of a 2D density estimate`) son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas.
 
 Su principal función consiste en mostrar la concentración de puntos en conjuntos de datos bidimensionales, lo que resulta particularmente útil cuando se trabaja con grandes volúmenes de información. Estos contornos facilitan la identificación de áreas con mayor densidad de observaciones en gráficos de dispersión, solucionando el problema de visualización que surge cuando hay numerosos puntos solapados.
 
@@ -608,7 +608,7 @@ p
 Esta trama de código de `ggplot2` se usa para dimensionar la magnitud de los homicidios dolosos a nivel municipal en un mapa. En la que los círculos son proporcionales a la magnitud de homicidios dolosos regitrados en el 2024.   
 
 
-```{r}
+```{r, class.source = "fold-hide"}
 p <- ggplot() + 
       layer_spatial(shape_estados, fill = "transparent", color = "black") + 
        geom_point(data = coords, aes(x = lon, y = lat, size = Total, color = Total), alpha = 0.6, shape = 21) +
@@ -631,7 +631,10 @@ p <- ggplot() +
                   y = "") 
 p
 ```
-## 2D Density Map
+
+
+
+## 2D Density Map    
 
 Se expanden los datos de homicidios y se genera un conjunto de observaciones donde cada municipio con homicidios dolosos se repite según el total de homicidios en ese municipio. Esto es importante, ya que los mapas de contornos contemplan las densidades, es decir, se contempla el número de repeticiones de sucesos delictivos en la zona y de esta manera determinar el ancho de los contornos en los mapas de calor.
 
@@ -684,10 +687,11 @@ p
 
 ### Casos específicos   
 
+#### Valle de México   
 
 A continuación se genera un mapa combinado de las áreas de homicidios dolosos en los estados de 09 (`Ciudad de México`), 15 (`Estado de México`) y 13 (`Hidalgo`), cuyos municipios en su mayoría recaen en la Zona Metropolitana del Valle de México (`ZMVM`). El mapa visualiza tanto puntos específicos de homicidios como densidad espacial de homicidios dentro de esos estados.
 
-```{r}
+```{r, class.source = "fold-hide"}
 capas_estados <- shape_estados %>%
                   sp::spChFIDs(., str_pad(shape_estados@data$CVEGEO, 2, "left", pad = "0")) %>%
                    fortify(., id = "CVE_GEO")
@@ -746,21 +750,12 @@ El mapa resultante tiene como objetivo visualizar la distribución espacial de l
 
 - **Densidad 2D**: Se representa la concentración de homicidios a lo largo del espacio geográfico. Las áreas más oscuras indican zonas con mayor densidad de homicidios, mientras que las áreas más claras tienen menor concentración.
 
-- **Enfoque específico**: El mapa está enfocado en tres estados específicos, lo que permite analizar la distribución de homicidios en una región determinada, lo cual es útil para estudios de seguridad, políticas públicas y análisis de patrones espaciales.
-
-```{r}
-library(ggplot2)
-library(sf)
-library(ggspatial)
-library(RColorBrewer) 
-tabla <- homicidios %>% 
-          filter(CVE_ENT == "11") 
+- **Enfoque específico**: El mapa está enfocado en tres estados específicos, lo que permite analizar la distribución de homicidios en una región determinada, lo cual es útil para estudios de seguridad, políticas públicas y análisis de patrones espaciales. 
 
 
+#### Guanajuato  
 
-              
-shp_municipios <- st_as_sf(layer_municipios)  
-
+```{r, class.source = "fold-hide"}
 capas_estados <- shape_estados %>%
                   sp::spChFIDs(., str_pad(shape_estados@data$CVEGEO, 2, "left", pad = "0")) %>%
                    fortify(., id = "CVE_GEO")
@@ -773,37 +768,44 @@ limites <- capas_estados %>%
                        max.y = max(.$lat))
  
 p <- ggplot() + 
-     
-         stat_density2d(data = tabla, aes(x = lon, y = lat, fill = stat(level)), geom = "polygon", alpha = 0.4
-                        ) + 
-   layer_spatial(shape_municipios,
+      stat_density2d(data = homicidios %>% filter(CVE_ENT == "11"), 
+                     aes(x = lon, y = lat, fill = stat(level)), 
+                     geom = "polygon", 
+                     alpha = 0.4) + 
+       layer_spatial(shape_municipios,
                      fill = "transparent", 
-                      size = 0.5,
-                      color = "#919191") + 
-      
-        geom_point(data = coords, aes(x = lon, y = lat, color = Total, size = Total), alpha = 0.6, shape = 21) +
-   layer_spatial(shape_estados, 
-                      fill = "transparent", 
+                     size = 0.5,
+                     color = "#919191") + 
+        geom_point(data = coords, 
+                   aes(x = lon, y = lat, color = Total, size = Total), 
+                   alpha = 0.6, 
+                   shape = 21) +
+         layer_spatial(shape_estados, 
+                       fill = "transparent", 
                        size = 5,
-                        color = "black") + 
-         # geom_contour_filled(data = coords %>% filter(CVE_ENT == "09"), aes(x = lon, y = lat, z = Total), color = "black", alpha = 0.5) +
-           theme_bw() + 
-           theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
-                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
-                 legend.key.size = unit(0.5, "cm"),
-                 legend.text = element_text(size = 12, family = "montserrat"), 
-                 legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
-                 legend.position = "right"
+                       color = "black") + 
+          theme_bw() + 
+           theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
+                  plot.subtitle = element_text(size = 12, hjust = 0.15, family = "montserrat"),
+                  legend.key.size = unit(0.5, "cm"),
+                  legend.text = element_text(size = 10, family = "montserrat"), 
+                  legend.title = element_text(size = 11, hjust = 0.5, family = "montserrat", face = "bold"),
+                  legend.position = "right"
                  ) + 
-          guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
-          scale_fill_viridis_c(option = "magma", direction = 1, begin = 0.5, end = 1) +  # Para densidad
-          scale_colour_gradientn(colours = rev(brewer.pal(7, "Blues"))) + 
-            coord_sf(xlim = c(limites$min.x, limites$max.x),
-                     ylim = c(limites$min.y, limites$max.y)) 
+            guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
+             scale_fill_viridis_c(option = "magma", direction = 1, begin = 0.5, end = 1) +  # Para densidad
+              scale_colour_gradientn(colours = rev(brewer.pal(7, "Blues"))) + 
+               coord_sf(xlim = c(limites$min.x, limites$max.x),
+                        ylim = c(limites$min.y, limites$max.y)) + 
+                labs(title = stringr::str_wrap("Mapa de densidades de homicidios dolosos en Guanajuato", 80),
+                     subtitle = stringr::str_wrap("Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (SESNSP)", 180),
+                     fill = stringr::str_wrap("Homicidios dolosos", 10), 
+                     caption = expression(paste("Elaboración propia")), 
+                     x = "", 
+                     y = "") 
 
 
 p
-
 ```
 
 ## Referencias
