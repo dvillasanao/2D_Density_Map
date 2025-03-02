@@ -151,6 +151,13 @@ v
 
 ## Objetivo  
 
+Los contornos de una estimación de densidad en 2D son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas. 
+
+Su principal función consiste en mostrar la concentración de puntos en conjuntos de datos bidimensionales, lo que resulta particularmente útil cuando se trabaja con grandes volúmenes de información. Estos contornos facilitan la identificación de áreas con mayor densidad de observaciones en gráficos de dispersión, solucionando el problema de visualización que surge cuando hay numerosos puntos solapados. 
+
+Además de visualizar distribuciones, estos contornos permiten detectar patrones y estructuras subyacentes en los datos, revelando agrupaciones naturales y la forma general de la distribución, ya sea unimodal, multimodal o con otras características distintivas. Una ventaja adicional es su capacidad para facilitar la comparación entre diferentes subconjuntos de datos, permitiendo superponer contornos en gráficos para analizar diferencias entre distintos grupos o categorías. 
+
+Finalmente, los contornos de estimación de densidad mejoran significativamente la interpretación de datos en gráficos de dispersión tradicionales, especialmente en situaciones donde la alta densidad de puntos dificulta la visualización clara de patrones, ofreciendo una representación más limpia y comprensible de la densidad sin necesidad de mostrar cada punto individual del conjunto de datos. 
 
 ## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
 
@@ -442,7 +449,7 @@ Para obtener información más precisa y actualizada, te recomiendo consultar la
 
 ```{r}
 homicidios <- df %>% 
-               filter(Tipo.de.delito %in% "Homicidio") %>% 
+               filter(Tipo.de.delito %in% "Homicidio")  %>% 
                 group_by(CVE_MUN) %>% 
                  summarise(Total = sum(Total, na.rm = TRUE))
 ```
@@ -502,6 +509,209 @@ Se fusionan los datos del `shape_municipios` con datos estadísticos del índice
 layer_municipios <- inner_join(shape_municipios,
                                 homicidios,
                                  by = join_by("CVE_GEO" == "CVE_MUN"))
+```
+
+## Centroides
+
+La función `coordinates()` extrae las coordenadas de los centroides de los polígonos en $(x,y)$ de la base de datos espacial y la almacenamos en la variable `coords`, para su posterior uso en el código.
+
+```{r}
+# Extrayendo coordenadas desde la base de datos espaciales.
+coords = coordinates(layer_municipios) %>% 
+          as.data.frame() %>% 
+           rename("lon" = "V1",
+                  "lat" = "V2") %>% 
+            cbind(layer_municipios@data[, c("CVE_GEO", "CVE_ENT", "Total")])  
+```
+
+```{r}
+homicidios <- df %>% 
+               filter(Subtipo.de.delito %in% "Homicidio doloso") %>% 
+                select(CVE_MUN) %>% 
+                 left_join(., coords, by = join_by("CVE_MUN" == "CVE_GEO")) %>% 
+                  arrange(CVE_MUN) %>% 
+                   filter(Total > 0)
+```
+
+
+## Mapa de homicidios  
+
+```{r}
+p <- ggplot() + 
+      layer_spatial(layer_municipios, aes(fill = Total), color = "transparent") + 
+       layer_spatial(shape_estados, fill = "transparent", color = "black") + 
+        theme_bw() + 
+         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+               legend.key.size = unit(0.5, "cm"),
+               legend.text = element_text(size = 12, family = "montserrat"), 
+               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.position = "right"
+               ) + 
+          scale_fill_viridis_c(option = "A", begin = 0.3, end = 1, direction = -1) +
+           scale_color_manual(values = c("#BDBDBD")) + 
+            guides(color = guide_legend(override.aes = list(fill = usecol(pal = pal_petrol, n = 5)))) +
+     labs(title = "Mapa coroplético de homicidios dolosos a nivel municipal",
+           fill = stringr::str_wrap("Homicidios dolosos", 10), 
+            caption = expression(paste("Elaboración propia")))
+p
+```
+
+## 2D Density Map   
+
+```{r}
+p <- ggplot() + 
+      layer_spatial(shape_estados, fill = "transparent", color = "black") + 
+       geom_point(data = coords, aes(x = lon, y = lat, size = Total, color = Total), alpha = 0.6, shape = 21) +
+        #stat_density_2d_filled(data = coords, aes(x = lon, y = lat, fill = ..Total..), alpha = 0.6) + 
+        theme_bw() + 
+         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+               legend.key.size = unit(0.5, "cm"),
+               legend.text = element_text(size = 12, family = "montserrat"), 
+               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.position = "right"
+               ) + 
+          guides(size = FALSE, alpha = FALSE) + 
+          scale_fill_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral")))
+
+p
+```
+
+```{r}
+homicidios <- coords %>% 
+               filter(Total > 0) %>% 
+                uncount(Total)
+```
+
+
+```{r}
+values <- colorRampPalette(c("white", "orange", "red"))(10)
+
+p <- ggplot() + 
+      layer_spatial(shape_estados, fill = "transparent", color = "black") + 
+        stat_density_2d_filled(data = homicidios, aes(x = lon, y = lat, fill = ..level..), alpha = 0.6) + 
+        theme_bw() + 
+         theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
+               plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+               legend.key.size = unit(0.5, "cm"),
+               legend.text = element_text(size = 12, family = "montserrat"), 
+               legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+               legend.position = "right"
+               ) + 
+          guides(size = FALSE, alpha = FALSE) + 
+          scale_fill_manual(values = values) + 
+          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral")))
+
+p
+```
+
+```{r}
+library(ggplot2)
+library(sf)
+library(ggspatial)
+library(RColorBrewer)
+
+shp_municipios <- st_as_sf(layer_municipios)  
+
+capas_estados <- shape_estados %>%
+                  sp::spChFIDs(., str_pad(shape_estados@data$CVEGEO, 2, "left", pad = "0")) %>%
+                   fortify(., id = "CVE_GEO")
+
+limites <- capas_estados %>%
+            filter(id == c("09", "15", "13")) %>%
+             summarise(min.x = min(.$long),
+                       max.x = max(.$long),
+                       min.y = min(.$lat),
+                       max.y = max(.$lat))
+ 
+p <- ggplot() + 
+      layer_spatial(shape_municipios, 
+                     fill = "transparent", 
+                      size = 0.5,
+                      color = "#919191") + 
+       layer_spatial(shape_estados, 
+                      fill = "transparent", 
+                       size = 5,
+                       color = "black") + 
+        geom_point(data = coords, aes(x = lon, y = lat, color = Total, size = Total), alpha = 0.6) +
+         stat_density_2d_filled(data = homicidios %>%
+                                 filter(CVE_ENT == c("09", "15", "13")), aes(x = lon, y = lat, fill = ..level..), color = "#919191", alpha = 0.6) + 
+          theme_bw() + 
+           theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                 legend.key.size = unit(0.5, "cm"),
+                 legend.text = element_text(size = 12, family = "montserrat"), 
+                 legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                 legend.position = "right"
+                 ) + 
+          guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
+          scale_fill_viridis_d(option = "magma", direction = -1, begin = 0.5, end = 1) +  # Para densidad
+          scale_colour_gradientn(colours = rev(brewer.pal(7, "Spectral"))) + 
+            coord_sf(xlim = c(limites$min.x, limites$max.x),
+                     ylim = c(limites$min.y, limites$max.y)) 
+
+p
+```
+
+
+```{r}
+library(ggplot2)
+library(sf)
+library(ggspatial)
+library(RColorBrewer) 
+tabla <- homicidios %>% 
+          filter(CVE_ENT == "32") 
+
+
+
+              
+shp_municipios <- st_as_sf(layer_municipios)  
+
+capas_estados <- shape_estados %>%
+                  sp::spChFIDs(., str_pad(shape_estados@data$CVEGEO, 2, "left", pad = "0")) %>%
+                   fortify(., id = "CVE_GEO")
+
+limites <- capas_estados %>%
+            filter(id == c("32")) %>%
+             summarise(min.x = min(.$long),
+                       max.x = max(.$long),
+                       min.y = min(.$lat),
+                       max.y = max(.$lat))
+ 
+p <- ggplot() + 
+     
+         stat_density2d(data = tabla, aes(x = lon, y = lat, fill = stat(level)), geom = "polygon", alpha = 0.4
+                        ) + 
+   layer_spatial(shape_municipios,
+                     fill = "transparent", 
+                      size = 0.5,
+                      color = "#919191") + 
+      
+        geom_point(data = coords, aes(x = lon, y = lat, color = Total, size = Total), alpha = 0.6, shape = 21) +
+   layer_spatial(shape_estados, 
+                      fill = "transparent", 
+                       size = 5,
+                        color = "black") + 
+         # geom_contour_filled(data = coords %>% filter(CVE_ENT == "09"), aes(x = lon, y = lat, z = Total), color = "black", alpha = 0.5) +
+           theme_bw() + 
+           theme(plot.title = element_text(size = 22, hjust = 0.15, family = "montserrat", face = "bold"),
+                 plot.caption = element_text(size = 11, hjust = 0.2, vjust = 1, family = "montserrat"), 
+                 legend.key.size = unit(0.5, "cm"),
+                 legend.text = element_text(size = 12, family = "montserrat"), 
+                 legend.title = element_text(size = 10, hjust = 0.5, family = "montserrat", face = "bold"),
+                 legend.position = "right"
+                 ) + 
+          guides(alpha = FALSE, fill = FALSE, color = FALSE) + 
+          scale_fill_viridis_c(option = "magma", direction = 1, begin = 0.5, end = 1) +  # Para densidad
+          scale_colour_gradientn(colours = rev(brewer.pal(7, "Blues"))) + 
+            coord_sf(xlim = c(limites$min.x, limites$max.x),
+                     ylim = c(limites$min.y, limites$max.y)) 
+
+
+p
+
 ```
 
 ## Referencias
