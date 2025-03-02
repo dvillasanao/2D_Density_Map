@@ -724,7 +724,7 @@ p <- ggplot() +
                     color = "#919191") + 
        layer_spatial(shape_estados, 
                      fill = "transparent", 
-                     size = 5,
+                     lwd = 1,
                      color = "black") + 
         geom_point(data = coords, aes(x = lon, y = lat, color = Total, size = Total), alpha = 0.6) +
          stat_density_2d_filled(data = homicidios %>%
@@ -796,7 +796,7 @@ p <- ggplot() +
                    shape = 21) +
          layer_spatial(shape_estados, 
                        fill = "transparent", 
-                       size = 5,
+                       lwd = 1,
                        color = "black") + 
           theme_bw() + 
            theme(plot.title = element_text(size = 14, hjust = 0.15, family = "montserrat", face = "bold"),
