@@ -74,3 +74,19 @@ instalados los siguientes paquetes en **R**:
 ``` r
 install.packages(c("tidyverse", "sf", "ggplot2", "ggspatial", "dplyr", "stringr"))
 ```
+
+## Resultados
+
+**Enlace**:
+<https://dvillasanao.github.io/Correlaciones_espaciales/Output/Correlaciones-a-nivel-municipal.html>
+
+## Código de Conducta
+
+Por favor, revisa nuestro [Código de Conducta](CODE_OF_CONDUCT.md) antes
+de contribuir.
+
+## Licencia
+
+Este trabajo de Diana Villasana Ocampo está bajo una
+<a rel="license" href="http://creativecommons.org/licenses/by/4.0/">
+Licencia Creative Commons Atribución 4.0 Internacional.</a>.
