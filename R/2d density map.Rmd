@@ -151,13 +151,29 @@ v
 
 ## Objetivo  
 
-Los contornos de una estimación de densidad en 2D son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas. 
+Los **contornos de una estimación de densidad en 2D** (`Contours of a 2D density estimate`) son una herramienta fundamental para la visualización estadística, permitiendo representar gráficamente la distribución de variables bidimensionales en un espacio de coordenadas. 
 
 Su principal función consiste en mostrar la concentración de puntos en conjuntos de datos bidimensionales, lo que resulta particularmente útil cuando se trabaja con grandes volúmenes de información. Estos contornos facilitan la identificación de áreas con mayor densidad de observaciones en gráficos de dispersión, solucionando el problema de visualización que surge cuando hay numerosos puntos solapados. 
 
 Además de visualizar distribuciones, estos contornos permiten detectar patrones y estructuras subyacentes en los datos, revelando agrupaciones naturales y la forma general de la distribución, ya sea unimodal, multimodal o con otras características distintivas. Una ventaja adicional es su capacidad para facilitar la comparación entre diferentes subconjuntos de datos, permitiendo superponer contornos en gráficos para analizar diferencias entre distintos grupos o categorías. 
 
-Finalmente, los contornos de estimación de densidad mejoran significativamente la interpretación de datos en gráficos de dispersión tradicionales, especialmente en situaciones donde la alta densidad de puntos dificulta la visualización clara de patrones, ofreciendo una representación más limpia y comprensible de la densidad sin necesidad de mostrar cada punto individual del conjunto de datos. 
+### **📌 Usos principales de los contornos de densidad en 2D para datos de homicidios:**
+  
+1. **📍 Identificación de zonas con alta incidencia de homicidios**  
+- Permiten encontrar **"hotspots"** o zonas donde los homicidios son más frecuentes.  
+- Útil para la **toma de decisiones en seguridad pública** y asignación de recursos policiales.  
+
+2. **⏳ Análisis temporal y espacial**  
+- Si se usa con **coordenadas geográficas** (latitud y longitud), los contornos mostrarán las áreas más afectadas.  
+- Si se usa con **fechas y horas**, se pueden detectar periodos del día o del año con mayor incidencia.  
+
+3. **🕵️‍♂️ Detección de patrones y tendencias criminales**  
+- Ayuda a identificar si los homicidios siguen una distribución aleatoria o si hay **patrones estructurados**.  
+- Se puede comparar la densidad en diferentes años para analizar la evolución del crimen en el tiempo.  
+
+4. **⚖️ Comparación de diferentes regiones o tipos de homicidios**  
+- Permite superponer los contornos de densidad de diferentes tipos de homicidios (por arma de fuego, por arma blanca, etc.)  
+- Se pueden comparar ciudades o regiones para ver dónde es más grave el problema.   
 
 ## Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública (`SESNSP`)   
 
@@ -454,6 +470,38 @@ homicidios <- df %>%
                  summarise(Total = sum(Total, na.rm = TRUE))
 ```
 
+A continuación, se presentan los primeros 10 estados con mayor número de incidencias delictiva (`Homicidios dolosos`).  
+
+```{r, echo = FALSE}
+require(gt)
+
+df %>% 
+ filter(Tipo.de.delito %in% "Homicidio")  %>% 
+  group_by(Entidad) %>% 
+   summarise(Total = sum(Total, na.rm = TRUE))%>% 
+    arrange(desc(Total)) %>% 
+     head(. , 15) %>%
+      gt() %>%
+       tab_header(title = "Reportes de incidencia homicidios a nivel municipal",
+                  subtitle = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública") %>%
+        tab_footnote(footnote = "Secretariado Ejecutivo del Sistema Nacional de Seguridad Pública | 20 de febrero de 2025") %>%
+        tab_options(heading.title.font.size = 14, 
+                    heading.subtitle.font.size = 12,
+                    table.font.names = "Century Gothic",
+                    table.font.size = 10,
+                    table.align = 'center',
+                    data_row.padding = px(1)) %>%
+         tab_style(style = list(cell_text(align = "left", 
+                                          weight = 'bold')),
+                    locations = list(cells_title(groups = c("title")))) %>%
+          tab_style(style = list(cell_text(align = "left")),
+                    locations = list(cells_title(groups = c("subtitle")))) %>%
+            cols_width(starts_with("Bien.jurídico.afectado") ~ px(180),
+                       starts_with("Modalidad") ~ px(180),
+                       everything() ~ px(100)) %>%
+             as_raw_html()
+```
+
 
 ## Marco Geoestadístico Nacional (MGN) 2020
 
@@ -662,7 +710,7 @@ library(sf)
 library(ggspatial)
 library(RColorBrewer) 
 tabla <- homicidios %>% 
-          filter(CVE_ENT == "32") 
+          filter(CVE_ENT == "11") 
 
 
 
@@ -674,7 +722,7 @@ capas_estados <- shape_estados %>%
                    fortify(., id = "CVE_GEO")
 
 limites <- capas_estados %>%
-            filter(id == c("32")) %>%
+            filter(id == c("11")) %>%
              summarise(min.x = min(.$long),
                        max.x = max(.$long),
                        min.y = min(.$lat),
